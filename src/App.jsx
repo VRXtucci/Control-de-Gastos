@@ -75,17 +75,12 @@ function App() {
   };
 
   const handleReset = () => {
-    const nuevasEtiquetas = etiquetas.map(etiqueta => ({
-      ...etiqueta,
-      categoria: "",
-      presupuesto: "",
-      actual: ""
-    }));
-    setEtiquetas(nuevasEtiquetas);
+    setEtiquetas([]);
     setIngresoTotal(160);
     localStorage.removeItem("etiquetas");
     localStorage.removeItem("ingresoTotal");
   };
+  
 
   const inputEstilos = "border rounded px-2 py-1 text-white bg-gray-700";
 
