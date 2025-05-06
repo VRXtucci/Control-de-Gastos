@@ -212,7 +212,7 @@ function App() {
                 <th className="py-2 text-white">Tipo</th>
                 <th className="py-2 text-white">Categoría</th>
                 <th className="py-2 text-white">Presupuesto</th>
-                <th className="py-2 text-white">Actual</th>
+                <th className="py-2 text-white">Real</th>
               </tr>
             </thead>
             <tbody>
