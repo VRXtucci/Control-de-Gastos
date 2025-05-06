@@ -32,6 +32,7 @@ function App() {
   });
 
   const [nuevoTipo, setNuevoTipo] = useState("");
+  const [mensajeLimite, setMensajeLimite] = useState(null);
 
   useEffect(() => {
     localStorage.setItem("ingresoTotal", ingresoTotal);
@@ -48,7 +49,22 @@ function App() {
   };
 
   const handleMontoChange = (index, campo, valor) => {
+    const nuevoValor = Number(valor);
     const nuevasEtiquetas = [...etiquetas];
+
+    if (campo === "actual") {
+      const totalSinActual = etiquetas.reduce((acc, item, i) => {
+        return i !== index ? acc + Number(item.actual || 0) : acc;
+      }, 0);
+
+      if (totalSinActual + nuevoValor > ingresoTotal) {
+        setMensajeLimite("¡Te pasaste del gasto!");
+        return;
+      } else {
+        setMensajeLimite(null);
+      }
+    }
+
     nuevasEtiquetas[index][campo] = valor;
     setEtiquetas(nuevasEtiquetas);
   };
@@ -77,12 +93,19 @@ function App() {
   const handleReset = () => {
     setEtiquetas([]);
     setIngresoTotal(160);
+    setMensajeLimite(null);
     localStorage.removeItem("etiquetas");
     localStorage.removeItem("ingresoTotal");
   };
-  
 
   const inputEstilos = "border rounded px-2 py-1 text-white bg-gray-700";
+
+  const capitalizarPalabras = (texto) =>
+    texto
+      .toLowerCase()
+      .split(" ")
+      .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1))
+      .join(" ");
 
   return (
     <div className="bg-gray-900 text-white min-h-screen">
@@ -165,10 +188,11 @@ function App() {
           <button
             onClick={() => {
               const tipo = nuevoTipo.trim();
+              const tipoCapitalizado = capitalizarPalabras(tipo);
               if (!tipo || etiquetas.find(et => et.nombre.toLowerCase() === tipo.toLowerCase())) return;
 
               setEtiquetas([...etiquetas, {
-                nombre: tipo,
+                nombre: tipoCapitalizado,
                 categoria: "",
                 presupuesto: "",
                 actual: ""
@@ -217,13 +241,18 @@ function App() {
                       className={`w-24 ${inputEstilos}`}
                     />
                   </td>
-                  <td className="py-1">
+                  <td className="py-1 relative group">
                     <input
                       type="number"
                       value={etiqueta.actual}
                       onChange={(e) => handleMontoChange(index, "actual", e.target.value)}
-                      className={`w-24 ${inputEstilos}`}
+                      className={`w-24 ${inputEstilos} ${totalActual >= ingresoTotal ? "border-red-500" : ""}`}
                     />
+                    {mensajeLimite && (
+                      <div className="w-36 absolute left-28 top-0 z-10 bg-red-600 text-white text-xs p-2 rounded shadow-lg hidden group-hover:block">
+                        {mensajeLimite}
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
